@@ -4,6 +4,7 @@ package fon.iot.smartplugspring.api;
 import fon.iot.smartplugspring.config.JwtTokenUtil;
 import fon.iot.smartplugspring.entity.SmartPlug;
 import fon.iot.smartplugspring.entity.UserEntity;
+import fon.iot.smartplugspring.exception.InvalidHeaders;
 import fon.iot.smartplugspring.service.SmartPlugService;
 import fon.iot.smartplugspring.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,49 +29,59 @@ public class SmartPlugResource {
         this.userService = userService;
     }
 
-    @GetMapping("/smart-plug/{plugID}")
+    @GetMapping("/{plugID}")
     public SmartPlug getSmartPlug(@PathVariable("plugID") Long plugID) {
         return smartPlugService.getSmartPlug(plugID);
     }
 
-    @GetMapping("/user/{ownerID}/smart-plugs")
-    public List<SmartPlug> getSmartPlugs(@PathVariable("ownerID") Long ownerID) {
-        return smartPlugService.getSmartPlugs(ownerID);
-    }
     @GetMapping("/get-my-smart-plugs")
     public List<SmartPlug> getMySmartPlugs(@RequestHeader HttpHeaders headers) {
-        return smartPlugService.getSmartPlugs(getOwnerIDFromToken(headers));
+        return smartPlugService.getMySmartPlugs(getOwnerUsernameFromHeaders(headers));
     }
 
-    private Long getOwnerIDFromToken(HttpHeaders headers) {
-        String token = headers.getFirst("Authorization").substring(7);
-        String username = tokenUtil.getUsernameFromToken(token);
-        UserEntity owner = userService.getUserByUsername(username);
-        return owner.getId();
+
+    private String getOwnerUsernameFromHeaders(HttpHeaders headers) {
+        String token = headers.getFirst("Authorization") == null ? "" : headers.getFirst("Authorization").substring(7);
+        if(token.isEmpty())
+            throw new InvalidHeaders("Unauthorized!");
+        return tokenUtil.getUsernameFromToken(token);
+
     }
 
-    @PutMapping("/smart-plug/{plugID}")
+    @PutMapping("/{plugID}")
     public SmartPlug updateSmartPlug(@PathVariable("plugID") Long plugID, @RequestBody SmartPlug smartPlug) {
         return smartPlugService.updateSmartPlug(plugID, smartPlug);
     }
 
-    @DeleteMapping("/smart-plug/{plugID}")
+    @PutMapping("/{plugID}/switch")
+    public SmartPlug smartPlugSwitch(@RequestHeader HttpHeaders headers, @PathVariable("plugID") Long plugID, @RequestBody boolean powerState) {
+        String ownerUsername = getOwnerUsernameFromHeaders(headers);
+        return smartPlugService.switchSmartPlug(ownerUsername, plugID, powerState);
+    }
+
+    @DeleteMapping("/{plugID}")
     public SmartPlug deleteSmartPlug(@PathVariable("plugID") Long plugID) {
         return smartPlugService.deleteSmartPlug(plugID);
     }
 
-    @GetMapping("/smart-plug/register/{plugID}")
+    @GetMapping("/register/{plugID}")
     public SmartPlug registerSmartPlug(HttpServletRequest request, @PathVariable("plugID") Long plugID) {
         String ipAddress = request.getRemoteAddr();
         return smartPlugService.registerSmartPlug(plugID, ipAddress);
     }
 
-    @GetMapping("/smart-plug/register2/{plugID}")
+    @GetMapping("/register2/{plugID}")
     public SmartPlug register2SmartPlug(HttpServletRequest request, @PathVariable("plugID") Long plugID) {
         String ipAddress = request.getRemoteAddr();
         return smartPlugService.registerSmartPlug(plugID, ipAddress);
     }
 
+//    private Long getOwnerIDFromHeaders(HttpHeaders headers) {
+//        String token = headers.getFirst("Authorization").substring(7);
+//        String username = tokenUtil.getUsernameFromToken(token);
+//        UserEntity owner = userService.getUserByUsername(username);
+//        return owner.getId();
+//    }
 
 //    @GetMapping("/plugstestdata")
 //    public List<SmartPlug> getDummyPlugs() {

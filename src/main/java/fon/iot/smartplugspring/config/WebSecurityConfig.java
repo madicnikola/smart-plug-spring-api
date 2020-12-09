@@ -55,13 +55,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.cors().and()
-        // We don't need Cross-Site Request Forgery support
+                // We don't need Cross-Site Request Forgery support
                 .csrf().disable()
                 // dont authenticate this particular request
-                .authorizeRequests().antMatchers("/authenticate", "/register").permitAll()
+                .authorizeRequests().antMatchers("/authenticate", "/register", "/").permitAll()
 
-        // all other requests need to be authenticated
-        .anyRequest().authenticated().and().
+                // all other requests need to be authenticated
+                .anyRequest().authenticated().and().
                 // make sure we use stateless session; session won't be used to
                 // store user's state.
                         exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()

@@ -1,8 +1,10 @@
 package fon.iot.smartplugspring.api;
 
 import fon.iot.smartplugspring.exception.ApplicationError;
+import fon.iot.smartplugspring.exception.InvalidHeaders;
 import fon.iot.smartplugspring.exception.NotFoundException;
 import fon.iot.smartplugspring.exception.UserAlreadyExists;
+import fon.iot.smartplugspring.service.UnauthorizedException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +34,16 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<ApplicationError> handleNotFoundException(UserAlreadyExists exception, WebRequest webRequest) {
         ApplicationError error = new ApplicationError();
         error.setCode(409);
+        error.setMessage(exception.getMessage());
+        error.setDetails(details);
+
+        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler({UnauthorizedException.class, InvalidHeaders.class})
+    public ResponseEntity<ApplicationError> handleNotAuthorizedException(UnauthorizedException exception, WebRequest webRequest) {
+        ApplicationError error = new ApplicationError();
+        error.setCode(210);
         error.setMessage(exception.getMessage());
         error.setDetails(details);
 

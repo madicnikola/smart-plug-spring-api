@@ -8,6 +8,9 @@ import java.util.List;
 
 public interface SmartPlugRepository extends JpaRepository<SmartPlug, Long> {
 
+
     List<SmartPlug> findAllByOwner(UserEntity owner);
+
+    List<SmartPlug> findAllByOwner_Username(String owner_username);
 
 }

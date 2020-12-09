@@ -13,10 +13,12 @@ import java.util.Optional;
 @Service
 public class SmartPlugService {
     private final SmartPlugRepository smartPlugRepository;
+    private final UserService userService;
 
     @Autowired
-    public SmartPlugService(SmartPlugRepository smartPlugRepository) {
+    public SmartPlugService(SmartPlugRepository smartPlugRepository, UserService userService) {
         this.smartPlugRepository = smartPlugRepository;
+        this.userService = userService;
     }
 
     public List<SmartPlug> getSmartPlugs(Long userID) {
@@ -55,7 +57,19 @@ public class SmartPlugService {
         return smartPlugRepository.save(plug);
     }
 
-    public List<SmartPlug> getSmartMyPlugs(String ownerUsername) {
-        return smartPlugRepository.findAllByOwner(new UserEntity(ownerUsername));
+    public List<SmartPlug> getMySmartPlugs(String ownerUsername) {
+        return smartPlugRepository.findAllByOwner_Username(ownerUsername);
+    }
+
+    public SmartPlug switchSmartPlug(String username, Long plugID, boolean powerState) {
+        SmartPlug smartPlug = getSmartPlug(plugID);
+        if (!smartPlug.getOwner().getUsername().equals(username)) {
+            System.out.println("exception");
+            throw new UnauthorizedException("Not authorized!");
+        }
+        // send request to arduino ..
+        // if successful
+        smartPlug.setTurnedOn(powerState);
+        return updateSmartPlug(plugID, smartPlug);
     }
 }
