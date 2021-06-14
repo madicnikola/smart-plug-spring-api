@@ -1,10 +1,10 @@
 package fon.iot.smartplugspring.api;
 
-import fon.iot.smartplugspring.exception.ApplicationError;
-import fon.iot.smartplugspring.exception.InvalidHeaders;
-import fon.iot.smartplugspring.exception.NotFoundException;
-import fon.iot.smartplugspring.exception.UserAlreadyExists;
-import fon.iot.smartplugspring.service.UnauthorizedException;
+import fon.iot.smartplugspring.exceptions.ApplicationError;
+import fon.iot.smartplugspring.exceptions.InvalidHeaders;
+import fon.iot.smartplugspring.exceptions.NotFoundException;
+import fon.iot.smartplugspring.exceptions.UserAlreadyExists;
+import fon.iot.smartplugspring.exceptions.UnauthorizedException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

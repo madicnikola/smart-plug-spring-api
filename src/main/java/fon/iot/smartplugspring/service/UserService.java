@@ -1,10 +1,16 @@
 package fon.iot.smartplugspring.service;
 
+import fon.iot.smartplugspring.config.JwtTokenUtil;
 import fon.iot.smartplugspring.dao.UserRepository;
+import fon.iot.smartplugspring.dto.PasswordChangeRequest;
 import fon.iot.smartplugspring.entity.UserEntity;
-import fon.iot.smartplugspring.exception.UserNotFoundException;
-import fon.iot.smartplugspring.exception.WrongPasswordException;
+import fon.iot.smartplugspring.exceptions.InvalidHeaders;
+import fon.iot.smartplugspring.exceptions.InvalidPasswordException;
+import fon.iot.smartplugspring.exceptions.UserNotFoundException;
+import fon.iot.smartplugspring.exceptions.WrongPasswordException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,10 +19,12 @@ import java.util.Optional;
 @Service
 public class UserService {
     private final UserRepository userRepository;
+    private final JwtTokenUtil tokenUtil;
 
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, JwtTokenUtil tokenUtil) {
         this.userRepository = userRepository;
+        this.tokenUtil = tokenUtil;
     }
 
     public List<UserEntity> getUsers() {
@@ -68,6 +76,31 @@ public class UserService {
             throw new WrongPasswordException("Wrong password");
         }
         return user;
+    }
+
+    public void changePassword(HttpHeaders headers, PasswordChangeRequest request) throws InvalidPasswordException {
+        String username = getUsernameFromHeaders(headers);
+        System.out.println(username);
+        UserEntity user = getUserByUsername(username);
+        System.out.println(request.getCurrentPassword());
+
+        if (new BCryptPasswordEncoder().matches(request.getCurrentPassword(), user.getPassword())) {
+            user.setPassword(new BCryptPasswordEncoder().encode(request.getNewPassword()));
+            userRepository.save(user);
+        } else {
+            throw new InvalidPasswordException("Wrong password!");
+        }
+
+
+    }
+
+    private String getUsernameFromHeaders(HttpHeaders headers) {
+        String token = headers.getFirst("Authorization") == null ? "" :
+                headers.getFirst("Authorization").substring(7);
+        if (token.isEmpty()) {
+            throw new InvalidHeaders("Unauthorized!");
+        }
+        return tokenUtil.getUsernameFromToken(token);
     }
 
     public UserEntity getUserByUsername(String username) {

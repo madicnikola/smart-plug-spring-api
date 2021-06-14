@@ -4,7 +4,7 @@ import fon.iot.smartplugspring.config.JwtTokenUtil;
 import fon.iot.smartplugspring.entity.JwtRequest;
 import fon.iot.smartplugspring.entity.JwtResponse;
 import fon.iot.smartplugspring.entity.UserEntity;
-import fon.iot.smartplugspring.exception.UserAlreadyExists;
+import fon.iot.smartplugspring.exceptions.UserAlreadyExists;
 import fon.iot.smartplugspring.service.JwtUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +16,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@CrossOrigin
 public class JwtAuthentication {
 
     private final AuthenticationManager authenticationManager;

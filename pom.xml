@@ -11,7 +11,7 @@
     <groupId>fon.iot</groupId>
     <artifactId>smart-plug-spring</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <name>smart-plug-spring</name>
     <description>Smart plug by Spring Boot</description>
 
@@ -39,10 +39,14 @@
             <scope>runtime</scope>
             <optional>true</optional>
         </dependency>
+        <!--        <dependency>-->
+        <!--            <groupId>org.springframework.boot</groupId>-->
+        <!--            <artifactId>spring-boot-starter-tomcat</artifactId>-->
+        <!--            <scope>provided</scope>-->
+        <!--        </dependency>-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-tomcat</artifactId>
-            <scope>provided</scope>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

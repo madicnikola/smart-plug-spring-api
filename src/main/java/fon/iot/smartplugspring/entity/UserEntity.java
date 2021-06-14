@@ -14,6 +14,7 @@ public class UserEntity {
     @NotNull
     private String username;
     private String password;
+    @Transient
     private String permissions;
 
     public UserEntity() {
